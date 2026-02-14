@@ -32,5 +32,19 @@
  *   calculateAutoFare(-2)   // => -1
  */
 export function calculateAutoFare(distance, waitingMinutes = 0) {
-  // Your code here
+  let total_rupees = 0;
+  if(typeof distance !=="number" || distance<=0 || waitingMinutes<0) return -1;
+  distance = Math.ceil(distance);
+  while(distance>=1){
+    if(distance==1) {total_rupees += 30}
+    else if(distance >=2 && distance <=5){
+      total_rupees += 15;
+    }else{
+      total_rupees += 10;
+    }
+    distance--;
+
+  }
+  total_rupees = total_rupees + Math.ceil(waitingMinutes/2)*5;
+  return total_rupees;
 }

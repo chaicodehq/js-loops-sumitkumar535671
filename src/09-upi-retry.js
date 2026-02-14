@@ -34,6 +34,45 @@
  *   // 5 attempts all fail, wait: 1+2+4+8 = 15s (no wait after last)
  *   // => { attempts: 5, success: false, totalWaitTime: 15 }
  */
-export function upiRetry(outcomes) {
-  // Your code here
+export function calculateEMI(principal, monthlyRate, emi) {
+ if (
+    typeof principal !== "number" ||
+    typeof monthlyRate !== "number" ||
+    typeof emi !== "number" ||
+    principal <= 0 ||
+    monthlyRate < 0 ||   // <-- FIXED HERE
+    emi <= 0
+  ) {
+    return { months: -1, totalPaid: -1, totalInterest: -1 };
+  }
+
+  // Infinite loop protection
+  if (emi <= principal * monthlyRate) {
+    return { months: -1, totalPaid: -1, totalInterest: -1 };
+  }
+
+  let remaining = principal;
+  let months = 0;
+  let totalPaid = 0;
+
+  while (remaining > 0) {
+    let interest = remaining * monthlyRate;
+    remaining += interest;
+
+    if (remaining < emi) {
+      totalPaid += remaining;
+      months++;
+      break;
+    }
+
+    remaining -= emi;
+    totalPaid += emi;
+    months++;
+  }
+
+  return {
+    months,
+    totalPaid,
+    totalInterest: totalPaid - principal,
+  };
 }

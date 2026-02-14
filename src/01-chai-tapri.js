@@ -27,5 +27,16 @@
  *   // => { totalChai: 0, totalRevenue: 0 }
  */
 export function chaiTapriRevenue(customers) {
-  // Your code here
+  let obj = { totalChai: 0, totalRevenue: 0 };
+  if(typeof customers !== "number" || !Number.isInteger(customers) || customers < 1) return { totalChai: 0, totalRevenue: 0 };
+  for(let i=1; i<=customers ; i++){
+    obj.totalChai += 1;
+    if(i % 3 === 0){
+      obj.totalRevenue += 15;
+    }
+    else{
+    obj.totalRevenue += 10;
+    }
+  }
+  return obj;
 }
