@@ -34,45 +34,33 @@
  *   // 5 attempts all fail, wait: 1+2+4+8 = 15s (no wait after last)
  *   // => { attempts: 5, success: false, totalWaitTime: 15 }
  */
-export function calculateEMI(principal, monthlyRate, emi) {
- if (
-    typeof principal !== "number" ||
-    typeof monthlyRate !== "number" ||
-    typeof emi !== "number" ||
-    principal <= 0 ||
-    monthlyRate < 0 ||   // <-- FIXED HERE
-    emi <= 0
-  ) {
-    return { months: -1, totalPaid: -1, totalInterest: -1 };
+export function upiRetry(outcomes) {
+  // Validation
+  if (!Array.isArray(outcomes) || outcomes.length === 0) {
+    return { attempts: 0, success: false, totalWaitTime: 0 };
   }
 
-  // Infinite loop protection
-  if (emi <= principal * monthlyRate) {
-    return { months: -1, totalPaid: -1, totalInterest: -1 };
-  }
+  let attempts = 0;
+  let success = false;
+  let totalWaitTime = 0;
+  let wait = 1;
 
-  let remaining = principal;
-  let months = 0;
-  let totalPaid = 0;
+  do {
+    let result = outcomes[attempts];
+    attempts++;
 
-  while (remaining > 0) {
-    let interest = remaining * monthlyRate;
-    remaining += interest;
-
-    if (remaining < emi) {
-      totalPaid += remaining;
-      months++;
+    if (result === "success") {
+      success = true;
       break;
     }
 
-    remaining -= emi;
-    totalPaid += emi;
-    months++;
-  }
+    // If fail and still attempts left (<5), add wait
+    if (attempts < 5) {
+      totalWaitTime += wait;
+      wait *= 2;
+    }
 
-  return {
-    months,
-    totalPaid,
-    totalInterest: totalPaid - principal,
-  };
+  } while (attempts < 5 && attempts < outcomes.length);
+
+  return { attempts, success, totalWaitTime };
 }

@@ -35,15 +35,29 @@
  */
 export function buildPlaylist(songs, maxDuration) {
   let obj = { count: 0, totalDuration: 0 };
-  if(!Array.isArray(songs) || songs.length == 0 || maxDuration<=0 ||typeof maxDuration !=="number") return { count: 0, totalDuration: 0 };
-  let i = 0;
-  while(i <= songs.length-1){
-    if(songs[i]<=0 || typeof songs[i] !=="number" || Number.isNaN(songs[i])) {i++}
 
-    if (obj.totalDuration + songs[i] > maxDuration) break;
+  if (!Array.isArray(songs) || typeof maxDuration !== "number" || maxDuration <= 0) {
+    return obj;
+  }
+
+  let i = 0;
+
+  while (i < songs.length) {
+    let song = songs[i];
+
+    // skip invalid songs
+    if (typeof song !== "number" || !Number.isFinite(song) || song <= 0) {
+      i++;
+      continue;
+    }
+
+    // check limit before adding
+    if (obj.totalDuration + song > maxDuration) break;
+
     obj.count++;
-    obj.totalDuration = obj.totalDuration + songs[i];
+    obj.totalDuration += song;
     i++;
   }
+
   return obj;
 }
